@@ -1,8 +1,15 @@
 {
-  "name": "quieto-palettes",
+  "name": "quieto-colors",
   "private": true,
   "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
+    "test": "npm test --workspaces --if-present",
+    "build": "npm run build --workspaces --if-present",
+    "lint": "eslint .",
+    "typecheck": "npm run typecheck --workspaces --if-present",
     "sync:notion": "tsx scripts/notion-sync.ts",
     "sync:notion:watch": "tsx scripts/notion-sync.ts watch"
   },
@@ -13,8 +20,10 @@
     "@types/node": "^22.0.0",
     "chokidar": "^4.0.0",
     "dotenv": "^16.0.0",
+    "eslint": "^10.1.0",
     "js-yaml": "^4.1.0",
     "tsx": "^4.0.0",
-    "typescript": "^5.8.0"
+    "typescript": "^5.8.0",
+    "typescript-eslint": "^8.58.0"
   }
 }
