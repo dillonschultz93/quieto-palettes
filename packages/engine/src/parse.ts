@@ -65,7 +65,7 @@ export function parseColor(input: string): Result<ParsedColor, ColorError> {
 
   const format = detectFormat(trimmed, parsed.mode);
   if (!format) {
-    return { ok: false, error: { code: 'UNSUPPORTED_FORMAT', message: `Color format "${parsed.mode}" is not supported. Use hex, rgb(), hsl(), or hsb().` } };
+    return { ok: false, error: { code: 'UNSUPPORTED_FORMAT', message: 'Unsupported color format. Use hex, rgb(), hsl(), or hsb(). Named colors are not supported.' } };
   }
 
   const oklchResult = toOklch(parsed);
