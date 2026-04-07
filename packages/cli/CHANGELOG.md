@@ -1,5 +1,11 @@
 # @quieto/palettes
 
+## 0.1.2
+
+### Patch Changes
+
+- Fixed an issue where resolve() wasn't following symlinks.
+
 ## 0.1.1
 
 ### Patch Changes
