@@ -131,6 +131,11 @@ function formatTitle(id: string): string {
   return `${epicNum}.${storyNum}: ${title}`;
 }
 
+/** Skip body sync for completed items — avoids slow block delete/append on every full sync. */
+function isMarkdownSyncSkippedForStatus(status: string | undefined): boolean {
+  return status === "done";
+}
+
 // ---------------------------------------------------------------------------
 // Notion — database setup
 // ---------------------------------------------------------------------------
@@ -292,6 +297,11 @@ async function syncAll(): Promise<SyncState> {
 
   for (const file of mdFiles) {
     const id = path.basename(file, ".md");
+    const status = sprint.development_status[id];
+    if (isMarkdownSyncSkippedForStatus(status)) {
+      console.log(`  skip content (done) → ${file}`);
+      continue;
+    }
     if (state.pageMap[id]) {
       console.log(`  syncing content → ${file}`);
       await syncMarkdownToPage(state, file);
@@ -352,7 +362,13 @@ async function watchMode(): Promise<void> {
             await upsertEntry(state, id, status);
             saveState(state);
           }
-          await syncMarkdownToPage(state, filename);
+          if (isMarkdownSyncSkippedForStatus(status)) {
+            console.log(
+              "[notion-sync] Skipping body sync (status is done). Change status in sprint-status.yaml to push content.",
+            );
+          } else {
+            await syncMarkdownToPage(state, filename);
+          }
           console.log("[notion-sync] Content sync complete.");
         }
       } catch (err) {
