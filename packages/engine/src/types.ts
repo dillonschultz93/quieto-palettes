@@ -58,6 +58,10 @@ export type Palette = {
   ramps: Ramp[];
 };
 
+export type CssExportOptions = {
+  naming: 'numeric';
+};
+
 export type ColorFormat = 'hex' | 'rgb' | 'hsl' | 'hsb';
 
 export type ColorError = {

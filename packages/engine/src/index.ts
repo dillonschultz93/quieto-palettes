@@ -8,6 +8,7 @@ export type {
   Ramp,
   ContrastResult,
   Palette,
+  CssExportOptions,
   ColorFormat,
   ColorError,
   Result,
@@ -19,3 +20,4 @@ export { oklchToHex, oklchToRgb, oklchToHsl, oklchToHsb } from './convert.js';
 export { generateRamp } from './generate.js';
 export { isInGamut, mapToGamut, clampOklchValues } from './gamut.js';
 export { calculateContrast } from './contrast.js';
+export { exportCSS } from './export-css.js';
