@@ -3,11 +3,22 @@
   "version": "0.0.1",
   "type": "module",
   "main": "./dist/index.js",
+  "bin": {
+    "quieto-palettes": "./dist/index.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@quieto/engine": "*"
+  },
+  "devDependencies": {
+    "vitest": "^4.1.2"
   }
 }
