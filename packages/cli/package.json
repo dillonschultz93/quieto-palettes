@@ -1,6 +1,6 @@
 {
-  "name": "quieto-palettes",
-  "version": "0.0.1",
+  "name": "@quieto/palettes",
+  "version": "0.1.1",
   "type": "module",
   "main": "./dist/index.js",
   "bin": {
@@ -9,6 +9,9 @@
   "engines": {
     "node": ">=20"
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc",
     "test": "vitest run",
@@ -16,7 +19,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@quieto/engine": "*"
+    "@quieto/engine": "^0.1.1"
   },
   "devDependencies": {
     "vitest": "^4.1.2"
