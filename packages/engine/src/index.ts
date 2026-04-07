@@ -2,6 +2,7 @@ export type {
   OklchColor,
   SeedConfig,
   RampConfig,
+  GenerateRampOptions,
   RampStep,
   Ramp,
   ContrastResult,
@@ -14,3 +15,4 @@ export type {
 
 export { parseColor } from './parse.js';
 export { oklchToHex, oklchToRgb, oklchToHsl, oklchToHsb } from './convert.js';
+export { generateRamp } from './generate.js';

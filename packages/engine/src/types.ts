@@ -28,6 +28,16 @@ export type Ramp = {
   name: string;
   seed: OklchColor;
   steps: RampStep[];
+  distribution: 'linear' | 'eased';
+  range: { min: number; max: number };
+};
+
+export type GenerateRampOptions = {
+  seed: OklchColor;
+  steps: number;
+  range: { min: number; max: number };
+  distribution: 'linear' | 'eased';
+  name?: string;
 };
 
 export type ContrastResult = {
