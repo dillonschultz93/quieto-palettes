@@ -62,6 +62,19 @@ export type CssExportOptions = {
   naming: 'numeric';
 };
 
+export type RampStateV1 = {
+  name: string;
+  seedHex: string;
+  steps: number;
+  range: { min: number; max: number };
+  distribution: 'linear' | 'eased';
+};
+
+export type PaletteStateV1 = {
+  version: 1;
+  ramps: RampStateV1[];
+};
+
 export type ColorFormat = 'hex' | 'rgb' | 'hsl' | 'hsb';
 
 export type ColorError = {
