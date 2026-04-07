@@ -24,4 +24,5 @@ export { isInGamut, mapToGamut, clampOklchValues } from './gamut.js';
 export { calculateContrast } from './contrast.js';
 export { exportCSS } from './export-css.js';
 export { exportJSON } from './export-json.js';
+export type { JsonExportStep, JsonExportContrastPair, JsonExportRamp, JsonExportPalette } from './export-json.js';
 export { serializeState, deserializeState, paletteToState } from './serialize.js';

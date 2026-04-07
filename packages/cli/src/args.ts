@@ -66,7 +66,7 @@ export function parseCliArgs(argv: string[]): ParseResult {
   }
 
   const seed = values.seed;
-  if (typeof seed !== 'string') {
+  if (typeof seed !== 'string' || seed.trim().length === 0) {
     return {
       kind: 'error',
       error: { code: 'MISSING_SEED', message: 'Missing required flag: --seed <color>' },
@@ -74,11 +74,11 @@ export function parseCliArgs(argv: string[]): ParseResult {
   }
 
   const stepsRaw = values.steps as string;
-  const steps = Number.parseInt(stepsRaw, 10);
-  if (!Number.isFinite(steps) || steps < 1) {
+  const steps = Number(stepsRaw);
+  if (!Number.isFinite(steps) || !Number.isInteger(steps) || steps < 1 || steps > 100) {
     return {
       kind: 'error',
-      error: { code: 'INVALID_STEPS', message: `Invalid --steps value: "${stepsRaw}". Must be a positive integer.` },
+      error: { code: 'INVALID_STEPS', message: `Invalid --steps value: "${stepsRaw}". Must be an integer between 1 and 100.` },
     };
   }
 
@@ -100,10 +100,10 @@ export function parseCliArgs(argv: string[]): ParseResult {
 
   const rangeMin = Number.parseFloat(values['range-min'] as string);
   const rangeMax = Number.parseFloat(values['range-max'] as string);
-  if (!Number.isFinite(rangeMin) || !Number.isFinite(rangeMax)) {
+  if (!Number.isFinite(rangeMin) || !Number.isFinite(rangeMax) || rangeMin < 0 || rangeMax > 1 || rangeMin >= rangeMax) {
     return {
       kind: 'error',
-      error: { code: 'INVALID_RANGE', message: 'Invalid --range-min or --range-max. Must be numbers between 0 and 1.' },
+      error: { code: 'INVALID_RANGE', message: 'Invalid --range-min or --range-max. Must be numbers between 0 and 1 with min < max.' },
     };
   }
 

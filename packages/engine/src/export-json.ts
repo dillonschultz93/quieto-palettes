@@ -1,7 +1,7 @@
 import type { Palette, ColorError, Result } from './types.js';
 import { calculateContrast } from './contrast.js';
 
-type JsonExportStep = {
+export type JsonExportStep = {
   hex: string;
   rgb: string;
   hsl: string;
@@ -11,7 +11,7 @@ type JsonExportStep = {
   isGamutClamped: boolean;
 };
 
-type JsonExportContrastPair = {
+export type JsonExportContrastPair = {
   pair: [string, string];
   ratio: number;
   aa: boolean;
@@ -20,12 +20,12 @@ type JsonExportContrastPair = {
   aaaLarge: boolean;
 };
 
-type JsonExportRamp = {
+export type JsonExportRamp = {
   name: string;
   steps: JsonExportStep[];
 };
 
-type JsonExportPalette = {
+export type JsonExportPalette = {
   ramps: JsonExportRamp[];
   contrast: JsonExportContrastPair[];
 };

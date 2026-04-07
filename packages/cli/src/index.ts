@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
 import { createRequire } from 'node:module';
+import { fileURLToPath } from 'node:url';
+import { resolve } from 'node:path';
 import { parseColor, generateRamp } from '@quieto/engine';
 import type { Palette } from '@quieto/engine';
 import { parseCliArgs } from './args.js';
@@ -68,7 +70,7 @@ export function run(argv: string[]): { code: number; stdout: string; stderr: str
 }
 
 // Only execute when run directly (not when imported in tests)
-const isDirectRun = process.argv[1] && import.meta.url.endsWith(process.argv[1].replace(/\\/g, '/'));
+const isDirectRun = process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1]);
 if (isDirectRun) {
   const result = run(process.argv);
   if (result.stdout) process.stdout.write(result.stdout);
