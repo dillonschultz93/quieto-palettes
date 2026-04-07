@@ -2,7 +2,8 @@
 
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
-import { resolve } from 'node:path';
+import { resolve, dirname } from 'node:path';
+import { realpathSync } from 'node:fs';
 import { parseColor, generateRamp } from '@quieto/engine';
 import type { Palette } from '@quieto/engine';
 import { parseCliArgs } from './args.js';
@@ -70,7 +71,14 @@ export function run(argv: string[]): { code: number; stdout: string; stderr: str
 }
 
 // Only execute when run directly (not when imported in tests)
-const isDirectRun = process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1]);
+const isDirectRun = (() => {
+  if (!process.argv[1]) return false;
+  try {
+    return fileURLToPath(import.meta.url) === realpathSync(resolve(process.argv[1]));
+  } catch {
+    return false;
+  }
+})();
 if (isDirectRun) {
   const result = run(process.argv);
   if (result.stdout) process.stdout.write(result.stdout);
