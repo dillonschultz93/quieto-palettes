@@ -4,7 +4,7 @@ An OKLCH-based accessible color palette generator. Input your brand colors, get 
 
 ## Status
 
-**Epic 1 (Engine Foundation)** is complete — 7 stories covering parsing, ramp generation, gamut mapping, contrast calculation, CSS export, and URL serialization. The web app and CLI are scaffolded but not yet implemented.
+**Epic 1 (Engine Foundation)** and **Epic 2 (CLI)** are complete — the color engine covers parsing, ramp generation, gamut mapping, contrast calculation, CSS/JSON export, and URL serialization. The CLI supports palette generation with CSS and JSON output formats.
 
 ## Monorepo Structure
 
@@ -12,7 +12,7 @@ An OKLCH-based accessible color palette generator. Input your brand colors, get 
 packages/
   engine/   — Pure TypeScript palette engine (OKLCH ramp generation, contrast calculation, export)
   web/      — React + Vite SPA (palette creation UI) — scaffolded
-  cli/      — CLI tool for programmatic palette generation — scaffolded
+  cli/      — CLI tool for programmatic palette generation
 ```
 
 ## Getting Started
@@ -22,6 +22,25 @@ npm install
 npm test            # Run all workspace tests
 npm run typecheck   # Type-check all packages
 npm run lint        # Lint all packages
+```
+
+### CLI Usage
+
+```bash
+# Build first
+npm run build -w packages/engine && npm run build -w packages/cli
+
+# Generate CSS custom properties
+node packages/cli/dist/index.js generate --seed "#2563EB" --format css
+
+# Generate JSON with all color formats and contrast data
+node packages/cli/dist/index.js generate --seed "#2563EB" --format json
+
+# Custom ramp name, step count, and distribution
+node packages/cli/dist/index.js generate --seed "#2563EB" --name blue --steps 12 --format json --distribution eased
+
+# View all options
+node packages/cli/dist/index.js --help
 ```
 
 ### Engine Development
@@ -82,12 +101,23 @@ Generates CSS custom properties with Tailwind-style numeric naming (50–900, li
 ```ts
 import { exportCSS } from '@quieto/engine';
 
-const css = exportCSS({ ramps: [ramp] });
+const css = exportCSS({ ramps: [ramp] }, { naming: 'numeric' });
 // :root {
 //   --color-blue-50: #e0edff;
 //   ...
 //   --color-blue-900: #0a1a3a;
 // }
+```
+
+### `exportJSON(palette)`
+
+Generates a JSON representation of the palette with all color formats (hex, rgb, hsl, hsb, oklch) per step and WCAG contrast data for all within-ramp pairs.
+
+```ts
+import { exportJSON } from '@quieto/engine';
+
+const json = exportJSON({ ramps: [ramp] });
+// { ramps: [{ name, steps: [...] }], contrast: [{ pair, ratio, aa, aaa, ... }] }
 ```
 
 ### `serializeState(palette)` / `deserializeState(encoded)`
@@ -109,7 +139,7 @@ Compresses palette configuration to a URL-safe base64url string for shareable li
 | Epic | Scope | Status |
 |------|-------|--------|
 | 1. Engine Foundation | Parsing, ramps, gamut, contrast, CSS export, serialization | Done |
-| 2. CLI | Basic generation, format options | Backlog |
+| 2. CLI | Basic generation, format options | In Review |
 | 3. Web App MVP | Seed input, ramp viz, contrast highlights, export, URL state | Backlog |
 | 4. Multi-Ramp | Multiple seed colors in one palette | Backlog |
 | 5. Theming | Light/dark theme generation | Backlog |
