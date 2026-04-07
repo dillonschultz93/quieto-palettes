@@ -1,5 +1,11 @@
 export type OklchColor = { l: number; c: number; h: number };
 
+export type GamutMapResult = {
+  color: OklchColor;
+  clamped: boolean;
+  originalChroma: number;
+};
+
 export type SeedConfig = {
   color: string;
   format: 'hex' | 'rgb' | 'hsl' | 'hsb' | 'auto';
