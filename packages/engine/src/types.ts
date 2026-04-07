@@ -41,3 +41,20 @@ export type ContrastResult = {
 export type Palette = {
   ramps: Ramp[];
 };
+
+export type ColorFormat = 'hex' | 'rgb' | 'hsl' | 'hsb';
+
+export type ColorError = {
+  code: string;
+  message: string;
+};
+
+export type Result<T, E> =
+  | { ok: true; value: T }
+  | { ok: false; error: E };
+
+export type ParsedColor = {
+  oklch: OklchColor;
+  original: string;
+  format: ColorFormat;
+};
