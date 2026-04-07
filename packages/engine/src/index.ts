@@ -18,3 +18,4 @@ export { parseColor } from './parse.js';
 export { oklchToHex, oklchToRgb, oklchToHsl, oklchToHsb } from './convert.js';
 export { generateRamp } from './generate.js';
 export { isInGamut, mapToGamut, clampOklchValues } from './gamut.js';
+export { calculateContrast } from './contrast.js';
