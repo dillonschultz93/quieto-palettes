@@ -1,0 +1,47 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.input {
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 1rem;
+  padding: 0.625rem 0.75rem;
+  border: 2px solid #ccc;
+  border-radius: 6px;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  transition: border-color 0.15s, outline-color 0.15s;
+}
+
+.input:focus-visible {
+  border-color: #2563eb;
+  outline-color: #2563eb;
+}
+
+.error {
+  color: #dc2626;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.previewRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.swatch {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.format {
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 0.875rem;
+  color: #666;
+}
