@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import type { OklchColor, RampConfig, ContrastResult, Palette } from './index.js';
+import type { OklchColor, RampConfig, ContrastResult, Palette } from '../index.js';
 
 describe('@quieto/engine', () => {
   it('exports core types without errors', () => {

@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import { exportCSS } from './export-css.js';
-import { parseColor } from './parse.js';
-import { generateRamp } from './generate.js';
-import type { Palette, Ramp, ColorError, Result } from './types.js';
+import { exportCSS } from '../export-css.js';
+import { parseColor } from '../parse.js';
+import { generateRamp } from '../generate.js';
+import type { Palette, Ramp, ColorError, Result } from '../types.js';
 
 function buildBlueRamp(): Ramp {
   const parsed = parseColor('#2563EB');

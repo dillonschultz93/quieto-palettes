@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { generateRamp } from './generate.js';
-import { isInGamut } from './gamut.js';
-import type { GenerateRampOptions, Ramp, ColorError, Result } from './types.js';
+import { generateRamp } from '../generate.js';
+import { isInGamut } from '../gamut.js';
+import type { GenerateRampOptions, Ramp, ColorError, Result } from '../types.js';
 
 const defaultSeed = { l: 0.55, c: 0.18, h: 264 };
 

@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import { serializeState, deserializeState, paletteToState } from './serialize.js';
-import { parseColor } from './parse.js';
-import { generateRamp } from './generate.js';
-import type { PaletteStateV1, ColorError, Result, Ramp } from './types.js';
+import { serializeState, deserializeState, paletteToState } from '../serialize.js';
+import { parseColor } from '../parse.js';
+import { generateRamp } from '../generate.js';
+import type { PaletteStateV1, ColorError, Result, Ramp } from '../types.js';
 
 const referenceState: PaletteStateV1 = {
   version: 1,

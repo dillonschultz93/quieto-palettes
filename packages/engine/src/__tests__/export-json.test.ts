@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import { exportJSON } from './export-json.js';
-import { generateRamp } from './generate.js';
-import { parseColor } from './parse.js';
-import type { Palette } from './types.js';
+import { exportJSON } from '../export-json.js';
+import { generateRamp } from '../generate.js';
+import { parseColor } from '../parse.js';
+import type { Palette } from '../types.js';
 
 function makePalette(seed: string, steps: number, name: string): Palette {
   const parsed = parseColor(seed);

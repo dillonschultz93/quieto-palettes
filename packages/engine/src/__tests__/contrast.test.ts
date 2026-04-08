@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { parseColor } from './parse.js';
-import { calculateContrast } from './contrast.js';
-import type { OklchColor, Result, ParsedColor, ColorError } from './types.js';
+import { parseColor } from '../parse.js';
+import { calculateContrast } from '../contrast.js';
+import type { OklchColor, Result, ParsedColor, ColorError } from '../types.js';
 
 function expectOk(result: Result<ParsedColor, ColorError>): ParsedColor {
   expect(result.ok).toBe(true);

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { run, getVersion } from './index.js';
+import { run, getVersion } from '../index.js';
 import { exportCSS, parseColor, generateRamp } from '@quieto/engine';
 import type { Palette } from '@quieto/engine';
 

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { parseCliArgs } from './args.js';
+import { parseCliArgs } from '../args.js';
 
 describe('parseCliArgs', () => {
   const base = ['node', 'quieto-palettes'];
