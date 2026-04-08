@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { isInGamut, mapToGamut, clampOklchValues } from './gamut.js';
+import { isInGamut, mapToGamut, clampOklchValues } from '../gamut.js';
 
 describe('isInGamut', () => {
   it('returns true for known in-gamut color (reference blue)', () => {

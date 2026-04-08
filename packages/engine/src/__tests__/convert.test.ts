@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { oklchToHex, oklchToRgb, oklchToHsl, oklchToHsb } from './convert.js';
-import type { OklchColor } from './types.js';
+import { oklchToHex, oklchToRgb, oklchToHsl, oklchToHsb } from '../convert.js';
+import type { OklchColor } from '../types.js';
 
 const blueish: OklchColor = { l: 0.546, c: 0.215, h: 264 };
 const achromatic: OklchColor = { l: 0.5, c: 0, h: 0 };

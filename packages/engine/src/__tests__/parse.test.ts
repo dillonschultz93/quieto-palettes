@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { parseColor } from './parse.js';
+import { parseColor } from '../parse.js';
 import { converter } from 'culori';
-import type { Result, ParsedColor, ColorError } from './types.js';
+import type { Result, ParsedColor, ColorError } from '../types.js';
 
 const toOklch = converter('oklch');
 
