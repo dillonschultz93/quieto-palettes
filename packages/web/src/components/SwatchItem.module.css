@@ -1,0 +1,68 @@
+.swatch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  min-height: 44px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.875rem;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: opacity 120ms ease, box-shadow 120ms ease;
+}
+
+.swatch:focus {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+.swatch[data-text-tone='dark'] {
+  color: #111;
+}
+
+.swatch[data-text-tone='light'] {
+  color: #fff;
+}
+
+.swatch[data-seed='true'] {
+  position: relative;
+  min-height: 56px;
+  outline: 3px solid #111;
+  outline-offset: -3px;
+  z-index: 1;
+  font-weight: 600;
+}
+
+.swatch[data-seed='true'][data-text-tone='light'] {
+  outline-color: #fff;
+}
+
+/* Hover/focus highlight states */
+.swatch[data-highlight='aaa'] {
+  box-shadow: inset 0 0 0 3px #16a34a, 0 0 12px rgba(22, 163, 74, 0.5);
+}
+
+.swatch[data-highlight='aa'] {
+  box-shadow: inset 0 0 0 2px #ca8a04, 0 0 6px rgba(202, 138, 4, 0.35);
+}
+
+.swatch[data-highlight='fail'] {
+  opacity: 0.3;
+}
+
+.swatch[data-highlight='active'] {
+  /* Hovered swatch itself stays at full appearance */
+  opacity: 1;
+}
+
+.hex {
+  font-variant-numeric: tabular-nums;
+}
+
+.seedBadge {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  opacity: 0.85;
+}
