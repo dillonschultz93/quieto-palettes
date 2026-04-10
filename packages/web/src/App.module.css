@@ -11,11 +11,9 @@
   margin-bottom: 1.5rem;
 }
 
-.rampPlaceholder {
-  margin-top: 2rem;
-  padding: 2rem;
-  border: 2px dashed #ccc;
-  border-radius: 8px;
-  text-align: center;
-  color: #888;
+.error {
+  margin-top: 1rem;
+  color: #dc2626;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 0.875rem;
 }
