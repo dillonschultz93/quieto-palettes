@@ -8,10 +8,15 @@ type ExportPanelProps = {
   palette: Palette;
 };
 
+type CopyScope = 'css' | 'link' | null;
+type CopyStatus = { scope: CopyScope; text: string };
+
+const EMPTY_STATUS: CopyStatus = { scope: null, text: '' };
+
 export function ExportPanel({ palette }: ExportPanelProps) {
   const panelId = useId();
   const [isOpen, setIsOpen] = useState(false);
-  const [copyStatus, setCopyStatus] = useState('');
+  const [copyStatus, setCopyStatus] = useState<CopyStatus>(EMPTY_STATUS);
   const codeRef = useRef<HTMLElement | null>(null);
   const copyTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const mountedRef = useRef(true);
@@ -31,13 +36,13 @@ export function ExportPanel({ palette }: ExportPanelProps) {
     if (!result.ok) console.error('[ExportPanel] exportCSS failed:', result.error);
   }, [result]);
 
-  const announceStatus = (status: string) => {
+  const announceStatus = (scope: Exclude<CopyScope, null>, text: string) => {
     if (!mountedRef.current) return;
-    flushSync(() => setCopyStatus(''));
-    setCopyStatus(status);
+    flushSync(() => setCopyStatus(EMPTY_STATUS));
+    setCopyStatus({ scope, text });
     clearTimeout(copyTimerRef.current);
     copyTimerRef.current = setTimeout(() => {
-      if (mountedRef.current) setCopyStatus('');
+      if (mountedRef.current) setCopyStatus(EMPTY_STATUS);
     }, 1500);
   };
 
@@ -58,9 +63,36 @@ export function ExportPanel({ palette }: ExportPanelProps) {
       } else {
         throw new Error('No clipboard mechanism available');
       }
-      announceStatus('Copied!');
+      announceStatus('css', 'Copied!');
     } catch {
-      announceStatus('Copy failed');
+      announceStatus('css', 'Copy failed');
+    }
+  };
+
+  const handleCopyLink = async () => {
+    if (typeof window === 'undefined') return;
+    const url = window.location.href;
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(url);
+      } else {
+        const ta = document.createElement('input');
+        ta.readOnly = true;
+        ta.value = url;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        try {
+          ta.select();
+          const copied = document.execCommand?.('copy') ?? false;
+          if (!copied) throw new Error('execCommand copy failed');
+        } finally {
+          document.body.removeChild(ta);
+        }
+      }
+      announceStatus('link', 'Copied link!');
+    } catch {
+      announceStatus('link', 'Copy link failed');
     }
   };
 
@@ -80,8 +112,19 @@ export function ExportPanel({ palette }: ExportPanelProps) {
     }
   };
 
-  const copyLabel =
-    copyStatus === 'Copied!' ? 'Copied!' : copyStatus === 'Copy failed' ? 'Failed' : 'Copy';
+  const cssLabel =
+    copyStatus.scope === 'css'
+      ? copyStatus.text === 'Copied!'
+        ? 'Copied!'
+        : 'Failed'
+      : 'Copy';
+
+  const linkLabel =
+    copyStatus.scope === 'link'
+      ? copyStatus.text === 'Copied link!'
+        ? 'Copied link!'
+        : 'Failed'
+      : 'Copy Link';
 
   return (
     <div className={styles.wrapper}>
@@ -106,7 +149,7 @@ export function ExportPanel({ palette }: ExportPanelProps) {
                   aria-label="Copy CSS to clipboard"
                   onClick={handleCopy}
                 >
-                  {copyLabel}
+                  {cssLabel}
                 </button>
                 <button
                   type="button"
@@ -115,6 +158,14 @@ export function ExportPanel({ palette }: ExportPanelProps) {
                   onClick={handleDownload}
                 >
                   Download
+                </button>
+                <button
+                  type="button"
+                  className={styles.action}
+                  aria-label="Copy shareable link to clipboard"
+                  onClick={handleCopyLink}
+                >
+                  {linkLabel}
                 </button>
               </div>
               <pre className={styles.code}>
@@ -140,7 +191,7 @@ export function ExportPanel({ palette }: ExportPanelProps) {
         aria-atomic="true"
         className={styles.srOnly}
       >
-        {copyStatus}
+        {copyStatus.text}
       </div>
     </div>
   );
