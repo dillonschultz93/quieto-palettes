@@ -134,6 +134,32 @@ describe('ExportPanel', () => {
     });
   });
 
+  describe('copy link button', () => {
+    const writeText = vi.fn();
+
+    beforeEach(() => {
+      writeText.mockReset().mockResolvedValue(undefined);
+      Object.defineProperty(navigator, 'clipboard', {
+        configurable: true,
+        value: { writeText },
+      });
+    });
+
+    it('copies window.location.href to clipboard', async () => {
+      render(<ExportPanel palette={buildPalette()} />);
+      fireEvent.click(screen.getByRole('button', { name: /export css/i }));
+      const link = screen.getByRole('button', {
+        name: /copy shareable link to clipboard/i,
+      });
+      await act(async () => {
+        fireEvent.click(link);
+        await Promise.resolve();
+      });
+      expect(writeText).toHaveBeenCalledTimes(1);
+      expect(writeText.mock.calls[0]![0]).toBe(window.location.href);
+    });
+  });
+
   it('has an accessible live region for copy feedback', () => {
     const { container } = render(<ExportPanel palette={buildPalette()} />);
     const live = container.querySelector('[aria-live="polite"]');

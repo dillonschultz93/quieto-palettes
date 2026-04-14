@@ -1,21 +1,39 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { parseColor } from '@quieto/engine';
 import type { ParsedColor } from '@quieto/engine';
 import styles from './SeedInput.module.css';
 
 type SeedInputProps = {
   onColorParsed: (parsed: ParsedColor) => void;
+  initialValue?: string;
 };
 
 function oklchToCss(oklch: { l: number; c: number; h: number }): string {
   return `oklch(${oklch.l} ${oklch.c} ${oklch.h})`;
 }
 
-export function SeedInput({ onColorParsed }: SeedInputProps) {
-  const [value, setValue] = useState('');
+export function SeedInput({ onColorParsed, initialValue }: SeedInputProps) {
+  const [value, setValue] = useState(initialValue ?? '');
   const [error, setError] = useState<string | null>(null);
   const [preview, setPreview] = useState<ParsedColor | null>(null);
   const lastSubmitted = useRef('');
+  const didAutoSubmitRef = useRef(false);
+
+  useEffect(() => {
+    if (didAutoSubmitRef.current) return;
+    const trimmed = (initialValue ?? '').trim();
+    if (!trimmed) return;
+    didAutoSubmitRef.current = true;
+    lastSubmitted.current = trimmed;
+    const result = parseColor(trimmed);
+    if (result.ok) {
+      setPreview(result.value);
+      onColorParsed(result.value);
+    } else {
+      setError(result.error.message);
+      setPreview(null);
+    }
+  }, [initialValue, onColorParsed]);
 
   const handleSubmit = () => {
     const trimmed = value.trim();
