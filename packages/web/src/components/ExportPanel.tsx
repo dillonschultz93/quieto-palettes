@@ -1,4 +1,5 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
 import { exportCSS } from '@quieto/engine';
 import type { Palette } from '@quieto/engine';
 import styles from './ExportPanel.module.css';
@@ -8,13 +9,37 @@ type ExportPanelProps = {
 };
 
 export function ExportPanel({ palette }: ExportPanelProps) {
+  const panelId = useId();
   const [isOpen, setIsOpen] = useState(false);
   const [copyStatus, setCopyStatus] = useState('');
   const codeRef = useRef<HTMLElement | null>(null);
   const copyTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const mountedRef = useRef(true);
 
   const result = useMemo(() => exportCSS(palette, { naming: 'numeric' }), [palette]);
   const cssString = result.ok ? result.value : '';
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      clearTimeout(copyTimerRef.current);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!result.ok) console.error('[ExportPanel] exportCSS failed:', result.error);
+  }, [result]);
+
+  const announceStatus = (status: string) => {
+    if (!mountedRef.current) return;
+    flushSync(() => setCopyStatus(''));
+    setCopyStatus(status);
+    clearTimeout(copyTimerRef.current);
+    copyTimerRef.current = setTimeout(() => {
+      if (mountedRef.current) setCopyStatus('');
+    }, 1500);
+  };
 
   const handleCopy = async () => {
     if (!result.ok) return;
@@ -27,14 +52,15 @@ export function ExportPanel({ palette }: ExportPanelProps) {
         const selection = window.getSelection();
         selection?.removeAllRanges();
         selection?.addRange(range);
+        const copied = document.execCommand?.('copy') ?? false;
+        selection?.removeAllRanges();
+        if (!copied) throw new Error('execCommand copy failed');
+      } else {
+        throw new Error('No clipboard mechanism available');
       }
-      setCopyStatus('Copied!');
-      clearTimeout(copyTimerRef.current);
-      copyTimerRef.current = setTimeout(() => setCopyStatus(''), 1500);
+      announceStatus('Copied!');
     } catch {
-      setCopyStatus('Copy failed');
-      clearTimeout(copyTimerRef.current);
-      copyTimerRef.current = setTimeout(() => setCopyStatus(''), 1500);
+      announceStatus('Copy failed');
     }
   };
 
@@ -46,10 +72,16 @@ export function ExportPanel({ palette }: ExportPanelProps) {
     a.href = url;
     a.download = 'palette.css';
     document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    try {
+      a.click();
+    } finally {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
   };
+
+  const copyLabel =
+    copyStatus === 'Copied!' ? 'Copied!' : copyStatus === 'Copy failed' ? 'Failed' : 'Copy';
 
   return (
     <div className={styles.wrapper}>
@@ -57,14 +89,14 @@ export function ExportPanel({ palette }: ExportPanelProps) {
         type="button"
         className={styles.toggle}
         aria-expanded={isOpen}
-        aria-controls="export-panel-content"
+        aria-controls={panelId}
         onClick={() => setIsOpen((prev) => !prev)}
       >
         Export CSS
       </button>
 
       {isOpen && (
-        <div id="export-panel-content" className={styles.panel}>
+        <div id={panelId} className={styles.panel}>
           {result.ok ? (
             <>
               <div className={styles.actions}>
@@ -74,7 +106,7 @@ export function ExportPanel({ palette }: ExportPanelProps) {
                   aria-label="Copy CSS to clipboard"
                   onClick={handleCopy}
                 >
-                  {copyStatus === 'Copied!' ? 'Copied!' : 'Copy'}
+                  {copyLabel}
                 </button>
                 <button
                   type="button"
@@ -96,7 +128,7 @@ export function ExportPanel({ palette }: ExportPanelProps) {
             </>
           ) : (
             <p className={styles.error} role="alert">
-              {result.error.message}
+              Could not generate CSS. Please try a different color.
             </p>
           )}
         </div>
