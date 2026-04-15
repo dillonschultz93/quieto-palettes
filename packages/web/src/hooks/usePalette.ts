@@ -2,17 +2,33 @@ import { useMemo } from 'react';
 import { generateRamp } from '@quieto/engine';
 import type { ColorError, ParsedColor, Ramp } from '@quieto/engine';
 
+export type RampConfig = {
+  steps: number;
+  rangeMin: number;
+  rangeMax: number;
+  distribution: 'linear' | 'eased';
+};
+
+export const DEFAULT_RAMP_CONFIG: RampConfig = {
+  steps: 10,
+  rangeMin: 0.05,
+  rangeMax: 0.97,
+  distribution: 'linear',
+};
+
 export type UsePaletteResult = {
   ramp: Ramp | null;
   error: ColorError | null;
 };
 
-export function usePalette(parsedColor: ParsedColor | null): UsePaletteResult {
-  // Memoize on the OKLCH primitive values so a new ParsedColor object with
-  // identical values does not cause regeneration.
+export function usePalette(
+  parsedColor: ParsedColor | null,
+  config: RampConfig = DEFAULT_RAMP_CONFIG,
+): UsePaletteResult {
   const l = parsedColor?.oklch.l ?? null;
   const c = parsedColor?.oklch.c ?? null;
   const h = parsedColor?.oklch.h ?? null;
+  const { steps, rangeMin, rangeMax, distribution } = config;
 
   return useMemo<UsePaletteResult>(() => {
     if (l === null || c === null || h === null) {
@@ -22,9 +38,9 @@ export function usePalette(parsedColor: ParsedColor | null): UsePaletteResult {
     try {
       const result = generateRamp({
         seed: { l, c, h },
-        steps: 10,
-        range: { min: 0.05, max: 0.97 },
-        distribution: 'linear',
+        steps,
+        range: { min: rangeMin, max: rangeMax },
+        distribution,
         name: 'color',
       });
 
@@ -33,7 +49,10 @@ export function usePalette(parsedColor: ParsedColor | null): UsePaletteResult {
       }
       return { ramp: null, error: result.error };
     } catch {
-      return { ramp: null, error: { code: 'GENERATION_FAILED' as const, message: 'Unexpected error generating ramp' } };
+      return {
+        ramp: null,
+        error: { code: 'GENERATION_FAILED' as const, message: 'Unexpected error generating ramp' },
+      };
     }
-  }, [l, c, h]);
+  }, [l, c, h, steps, rangeMin, rangeMax, distribution]);
 }

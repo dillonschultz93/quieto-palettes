@@ -97,6 +97,107 @@ describe('App', () => {
     expect(window.location.hash).toMatch(/^#s=/);
   });
 
+  it('regenerates the ramp with a new step count', () => {
+    const { container } = render(<App />);
+    enterColor('#2563EB');
+    expect(container.querySelectorAll('[role="listitem"]')).toHaveLength(10);
+
+    const stepsInput = screen.getByLabelText(/steps/i);
+    fireEvent.change(stepsInput, { target: { value: '12' } });
+    fireEvent.blur(stepsInput);
+
+    expect(container.querySelectorAll('[role="listitem"]')).toHaveLength(12);
+    expect(container.querySelectorAll('[data-seed="true"]')).toHaveLength(1);
+  });
+
+  it('toggles distribution to eased and changes step spacing', () => {
+    const { container } = render(<App />);
+    enterColor('#2563EB');
+    const linearLs = Array.from(
+      container.querySelectorAll('[data-l]'),
+    ).map((el) => parseFloat(el.getAttribute('data-l') ?? '0'));
+
+    const dist = screen.getByLabelText(/distribution/i);
+    fireEvent.change(dist, { target: { value: 'eased' } });
+
+    const easedLs = Array.from(
+      container.querySelectorAll('[data-l]'),
+    ).map((el) => parseFloat(el.getAttribute('data-l') ?? '0'));
+
+    expect(easedLs).toHaveLength(linearLs.length);
+    const anyDiffers = easedLs.some(
+      (l, i) => Math.abs(l - (linearLs[i] ?? l)) > 0.001,
+    );
+    expect(anyDiffers).toBe(true);
+  });
+
+  it('honors lightness ceiling via rangeMax', () => {
+    const { container } = render(<App />);
+    enterColor('#2563EB');
+    const maxInput = screen.getByLabelText(/lightness max/i);
+    fireEvent.change(maxInput, { target: { value: '0.85' } });
+    fireEvent.blur(maxInput);
+
+    const swatches = container.querySelectorAll('[data-l]');
+    expect(swatches.length).toBeGreaterThan(0);
+    for (const el of swatches) {
+      const l = parseFloat(el.getAttribute('data-l') ?? '0');
+      expect(l).toBeLessThanOrEqual(0.851);
+    }
+  });
+
+  it('honors lightness floor via rangeMin', () => {
+    const { container } = render(<App />);
+    enterColor('#2563EB');
+    const minInput = screen.getByLabelText(/lightness min/i);
+    fireEvent.change(minInput, { target: { value: '0.15' } });
+    fireEvent.blur(minInput);
+
+    const swatches = container.querySelectorAll('[data-l]');
+    expect(swatches.length).toBeGreaterThan(0);
+    for (const el of swatches) {
+      const l = parseFloat(el.getAttribute('data-l') ?? '0');
+      expect(l).toBeGreaterThanOrEqual(0.149);
+    }
+  });
+
+  it('keeps the previous ramp rendered when a new config is invalid', () => {
+    const { container } = render(<App />);
+    enterColor('#2563EB');
+    const minInput = screen.getByLabelText(/lightness min/i);
+    fireEvent.change(minInput, { target: { value: '0.99' } });
+    fireEvent.blur(minInput);
+
+    expect(screen.getByRole('alert')).toBeInTheDocument();
+    expect(container.querySelectorAll('[role="listitem"]').length).toBeGreaterThan(0);
+  });
+
+  it('restores configuration from a URL hash', () => {
+    const parsed = parseColor('#2563EB');
+    if (!parsed.ok) throw new Error('fixture parse failed');
+    const customRamp = generateRamp({
+      seed: parsed.value.oklch,
+      steps: 12,
+      range: { min: 0.1, max: 0.9 },
+      distribution: 'eased',
+      name: 'color',
+    });
+    if (!customRamp.ok) throw new Error('fixture generate failed');
+    const encoded = serializeState(paletteToState({ ramps: [customRamp.value] }));
+    window.location.hash = '#s=' + encoded;
+
+    const { container } = render(<App />);
+    expect(container.querySelectorAll('[role="listitem"]')).toHaveLength(12);
+    expect((screen.getByLabelText(/distribution/i) as HTMLSelectElement).value).toBe('eased');
+    expect((screen.getByLabelText(/steps/i) as HTMLInputElement).value).toBe('12');
+    expect(
+      parseFloat((screen.getByLabelText(/lightness min/i) as HTMLInputElement).value),
+    ).toBeCloseTo(0.1, 2);
+    expect(
+      parseFloat((screen.getByLabelText(/lightness max/i) as HTMLInputElement).value),
+    ).toBeCloseTo(0.9, 2);
+  });
+
   it('regenerates the ramp when the seed changes', () => {
     const { container } = render(<App />);
     enterColor('#2563EB');

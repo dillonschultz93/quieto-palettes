@@ -5,10 +5,12 @@ import {
   serializeState,
 } from '@quieto/engine';
 import type { Palette, PaletteStateV1 } from '@quieto/engine';
+import type { RampConfig } from './usePalette';
 
 type UseUrlStateResult = {
   initialState: PaletteStateV1 | null;
   initialSeedHex: string | null;
+  initialConfig: RampConfig | null;
   writeState: (palette: Palette) => void;
 };
 
@@ -16,6 +18,11 @@ type ReadResult = {
   state: PaletteStateV1 | null;
   malformed: boolean;
 };
+
+function clampNumber(n: number, min: number, max: number): number {
+  const v = Number.isFinite(n) ? n : min;
+  return Math.min(Math.max(v, min), max);
+}
 
 function isBrowser(): boolean {
   return typeof window !== 'undefined' && typeof history !== 'undefined';
@@ -57,7 +64,17 @@ export function useUrlState(): UseUrlStateResult {
     initialRef.current = readInitialState();
   }
   const { state: initialState, malformed } = initialRef.current;
-  const initialSeedHex = initialState?.ramps[0]?.seedHex ?? null;
+  const firstRamp = initialState?.ramps[0] ?? null;
+  const initialSeedHex = firstRamp?.seedHex ?? null;
+  const initialConfig: RampConfig | null = firstRamp
+    ? {
+        steps: clampNumber(Math.round(firstRamp.steps), 2, 60),
+        rangeMin: clampNumber(firstRamp.range.min, 0, 1),
+        rangeMax: clampNumber(firstRamp.range.max, 0, 1),
+        distribution:
+          firstRamp.distribution === 'eased' ? 'eased' : 'linear',
+      }
+    : null;
 
   useEffect(() => {
     if (malformed) stripHash();
@@ -75,5 +92,5 @@ export function useUrlState(): UseUrlStateResult {
     history.replaceState(null, '', next);
   }, []);
 
-  return { initialState, initialSeedHex, writeState };
+  return { initialState, initialSeedHex, initialConfig, writeState };
 }
