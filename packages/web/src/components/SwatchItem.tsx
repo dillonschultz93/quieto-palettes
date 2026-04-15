@@ -33,6 +33,7 @@ export function SwatchItem({
       data-seed={step.isSeed ? 'true' : 'false'}
       data-text-tone={textTone}
       data-highlight={highlightState}
+      data-l={step.oklch.l.toFixed(3)}
       aria-label={label}
       onMouseEnter={onHover ? () => onHover(step.id) : undefined}
       onFocus={onFocus ? () => onFocus(step.id) : undefined}
