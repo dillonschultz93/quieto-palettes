@@ -23,6 +23,7 @@ describe('SeedInput', () => {
     expect(onColorParsed).toHaveBeenCalledTimes(1);
     expect(onColorParsed).toHaveBeenCalledWith(
       expect.objectContaining({ format: 'hex', original: '#2563EB' }),
+      undefined,
     );
   });
 
@@ -37,6 +38,7 @@ describe('SeedInput', () => {
     expect(screen.getByText('RGB')).toBeInTheDocument();
     expect(onColorParsed).toHaveBeenCalledWith(
       expect.objectContaining({ format: 'rgb' }),
+      undefined,
     );
   });
 
@@ -51,6 +53,7 @@ describe('SeedInput', () => {
     expect(screen.getByText('HSL')).toBeInTheDocument();
     expect(onColorParsed).toHaveBeenCalledWith(
       expect.objectContaining({ format: 'hsl' }),
+      undefined,
     );
   });
 
@@ -65,6 +68,7 @@ describe('SeedInput', () => {
     expect(screen.getByText('HSB')).toBeInTheDocument();
     expect(onColorParsed).toHaveBeenCalledWith(
       expect.objectContaining({ format: 'hsb' }),
+      undefined,
     );
   });
 

@@ -5,13 +5,14 @@ import {
   serializeState,
 } from '@quieto/engine';
 import type { Palette, PaletteStateV1 } from '@quieto/engine';
-import type { RampConfig } from './usePalette';
+import type { RampConfig } from './usePalettes';
 
 type UseUrlStateResult = {
   initialState: PaletteStateV1 | null;
-  initialSeedHex: string | null;
+  initialSeeds: string[];
   initialConfig: RampConfig | null;
   writeState: (palette: Palette) => void;
+  clearHash: () => void;
 };
 
 type ReadResult = {
@@ -64,8 +65,8 @@ export function useUrlState(): UseUrlStateResult {
     initialRef.current = readInitialState();
   }
   const { state: initialState, malformed } = initialRef.current;
+  const initialSeeds = initialState?.ramps.map((r) => r.seedHex) ?? [];
   const firstRamp = initialState?.ramps[0] ?? null;
-  const initialSeedHex = firstRamp?.seedHex ?? null;
   const initialConfig: RampConfig | null = firstRamp
     ? {
         steps: clampNumber(Math.round(firstRamp.steps), 2, 60),
@@ -92,5 +93,9 @@ export function useUrlState(): UseUrlStateResult {
     history.replaceState(null, '', next);
   }, []);
 
-  return { initialState, initialSeedHex, initialConfig, writeState };
+  const clearHash = useCallback(() => {
+    stripHash();
+  }, []);
+
+  return { initialState, initialSeeds, initialConfig, writeState, clearHash };
 }

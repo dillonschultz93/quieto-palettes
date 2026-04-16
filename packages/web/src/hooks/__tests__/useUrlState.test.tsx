@@ -47,7 +47,7 @@ describe('useUrlState', () => {
   it('returns null initial state when hash is empty', () => {
     const { result } = renderHook(() => useUrlState());
     expect(result.current.initialState).toBeNull();
-    expect(result.current.initialSeedHex).toBeNull();
+    expect(result.current.initialSeeds).toEqual([]);
   });
 
   it('decodes a valid hash on mount', () => {
@@ -56,7 +56,7 @@ describe('useUrlState', () => {
 
     const { result } = renderHook(() => useUrlState());
     expect(result.current.initialState).not.toBeNull();
-    expect(result.current.initialSeedHex).toBe('2563eb');
+    expect(result.current.initialSeeds).toEqual(['2563eb']);
   });
 
   it('strips malformed hash and returns null', () => {
@@ -109,6 +109,6 @@ describe('useUrlState', () => {
     window.location.hash = '#' + hash;
 
     const { result: reader } = renderHook(() => useUrlState());
-    expect(reader.current.initialSeedHex).toBe('eb2525');
+    expect(reader.current.initialSeeds).toEqual(['eb2525']);
   });
 });

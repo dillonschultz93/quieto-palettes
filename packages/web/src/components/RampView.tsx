@@ -84,7 +84,7 @@ export function RampView({ ramp }: RampViewProps) {
     <div className={styles.rampWrapper}>
       <ul
         role="list"
-        aria-label="Color ramp"
+        aria-label={ramp.name ? `Color ramp: ${ramp.name}` : 'Color ramp'}
         className={styles.ramp}
         onMouseLeave={(e) => {
           // Don't clear if a swatch still has keyboard focus

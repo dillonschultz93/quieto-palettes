@@ -1,5 +1,5 @@
 import { useEffect, useId, useState } from 'react';
-import type { RampConfig } from '../hooks/usePalette';
+import type { RampConfig } from '../hooks/usePalettes';
 import styles from './RampControls.module.css';
 
 type RampControlsProps = {
