@@ -4,20 +4,32 @@ import type { ParsedColor } from '@quieto/engine';
 import styles from './SeedInput.module.css';
 
 type SeedInputProps = {
-  onColorParsed: (parsed: ParsedColor) => void;
+  onColorParsed: (parsed: ParsedColor, id?: string) => void;
   initialValue?: string;
+  id?: string;
+  ariaLabel?: string;
+  externalError?: string;
 };
 
 function oklchToCss(oklch: { l: number; c: number; h: number }): string {
   return `oklch(${oklch.l} ${oklch.c} ${oklch.h})`;
 }
 
-export function SeedInput({ onColorParsed, initialValue }: SeedInputProps) {
+export function SeedInput({
+  onColorParsed,
+  initialValue,
+  id,
+  ariaLabel,
+  externalError,
+}: SeedInputProps) {
   const [value, setValue] = useState(initialValue ?? '');
   const [error, setError] = useState<string | null>(null);
   const [preview, setPreview] = useState<ParsedColor | null>(null);
   const lastSubmitted = useRef('');
   const didAutoSubmitRef = useRef(false);
+
+  const onColorParsedRef = useRef(onColorParsed);
+  onColorParsedRef.current = onColorParsed;
 
   useEffect(() => {
     if (didAutoSubmitRef.current) return;
@@ -28,12 +40,13 @@ export function SeedInput({ onColorParsed, initialValue }: SeedInputProps) {
     const result = parseColor(trimmed);
     if (result.ok) {
       setPreview(result.value);
-      onColorParsed(result.value);
+      onColorParsedRef.current(result.value, id);
     } else {
       setError(result.error.message);
       setPreview(null);
     }
-  }, [initialValue, onColorParsed]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialValue, id]);
 
   const handleSubmit = () => {
     const trimmed = value.trim();
@@ -44,7 +57,7 @@ export function SeedInput({ onColorParsed, initialValue }: SeedInputProps) {
     if (result.ok) {
       setError(null);
       setPreview(result.value);
-      onColorParsed(result.value);
+      onColorParsed(result.value, id);
     } else {
       setError(result.error.message);
       setPreview(null);
@@ -63,7 +76,8 @@ export function SeedInput({ onColorParsed, initialValue }: SeedInputProps) {
     if (error) setError(null);
   };
 
-  const errorId = 'seed-input-error';
+  const errorId = id ? `seed-input-error-${id}` : 'seed-input-error';
+  const displayedError = error ?? externalError ?? null;
 
   return (
     <div className={styles.wrapper}>
@@ -75,13 +89,13 @@ export function SeedInput({ onColorParsed, initialValue }: SeedInputProps) {
         onKeyDown={handleKeyDown}
         onBlur={handleSubmit}
         placeholder="Paste a color (e.g., #2563EB)"
-        aria-label="Seed color input"
-        aria-describedby={error ? errorId : undefined}
-        aria-invalid={error ? true : undefined}
+        aria-label={ariaLabel ?? 'Seed color input'}
+        aria-describedby={displayedError ? errorId : undefined}
+        aria-invalid={displayedError ? true : undefined}
       />
-      {error && (
+      {displayedError && (
         <p id={errorId} className={styles.error} role="alert">
-          {error}
+          {displayedError}
         </p>
       )}
       {preview && (

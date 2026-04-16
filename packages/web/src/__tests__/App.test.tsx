@@ -210,4 +210,126 @@ describe('App', () => {
     expect(secondSeedHex).toBeTruthy();
     expect(secondSeedHex).not.toEqual(firstSeedHex);
   });
+
+  describe('multiple seeds', () => {
+    function enterColorAt(index: number, value: string) {
+      const inputs = screen.getAllByPlaceholderText(
+        'Paste a color (e.g., #2563EB)',
+      );
+      const input = inputs[index];
+      if (!input) throw new Error(`no input at index ${index}`);
+      fireEvent.change(input, { target: { value } });
+      fireEvent.keyDown(input, { key: 'Enter' });
+    }
+
+    it('starts with a single seed input and one Remove button', () => {
+      render(<App />);
+      expect(
+        screen.getAllByPlaceholderText('Paste a color (e.g., #2563EB)'),
+      ).toHaveLength(1);
+      expect(screen.getAllByRole('button', { name: /remove/i })).toHaveLength(1);
+    });
+
+    it('Add Seed appends an empty seed row', () => {
+      render(<App />);
+      fireEvent.click(screen.getByRole('button', { name: /add seed/i }));
+      expect(
+        screen.getAllByPlaceholderText('Paste a color (e.g., #2563EB)'),
+      ).toHaveLength(2);
+    });
+
+    it('renders two ramps when two seeds are entered', () => {
+      render(<App />);
+      enterColorAt(0, '#2563EB');
+      fireEvent.click(screen.getByRole('button', { name: /add seed/i }));
+      enterColorAt(1, '#EB2525');
+
+      const ramps = screen.getAllByRole('list', { name: /color ramp/i });
+      expect(ramps).toHaveLength(2);
+      for (const list of ramps) {
+        expect(within(list).getAllByRole('listitem')).toHaveLength(10);
+      }
+    });
+
+    it('disables Add Seed after the third seed is added', () => {
+      render(<App />);
+      const addButton = screen.getByRole('button', { name: /add seed/i });
+      fireEvent.click(addButton);
+      fireEvent.click(addButton);
+      expect(
+        screen.getAllByPlaceholderText('Paste a color (e.g., #2563EB)'),
+      ).toHaveLength(3);
+      expect(addButton).toHaveAttribute('aria-disabled', 'true');
+    });
+
+    it('removing a seed row removes its ramp', () => {
+      render(<App />);
+      enterColorAt(0, '#2563EB');
+      fireEvent.click(screen.getByRole('button', { name: /add seed/i }));
+      enterColorAt(1, '#EB2525');
+      expect(screen.getAllByRole('list', { name: /color ramp/i })).toHaveLength(2);
+
+      const removeButtons = screen.getAllByRole('button', {
+        name: /remove/i,
+      });
+      fireEvent.click(removeButtons[0]!);
+      expect(screen.getAllByRole('list', { name: /color ramp/i })).toHaveLength(1);
+    });
+
+    it('applies the same config to every ramp', () => {
+      const { container } = render(<App />);
+      enterColorAt(0, '#2563EB');
+      fireEvent.click(screen.getByRole('button', { name: /add seed/i }));
+      enterColorAt(1, '#EB2525');
+
+      const stepsInput = screen.getByLabelText(/steps/i);
+      fireEvent.change(stepsInput, { target: { value: '12' } });
+      fireEvent.blur(stepsInput);
+
+      const ramps = screen.getAllByRole('list', { name: /color ramp/i });
+      expect(ramps).toHaveLength(2);
+      for (const list of ramps) {
+        expect(within(list).getAllByRole('listitem')).toHaveLength(12);
+      }
+      expect(container.querySelectorAll('[data-seed="true"]')).toHaveLength(2);
+    });
+
+    it('restores multiple seeds from a URL hash', () => {
+      const seeds = ['#2563EB', '#EB2525'];
+      const ramps = seeds.map((hex, i) => {
+        const p = parseColor(hex);
+        if (!p.ok) throw new Error('fixture parse failed');
+        const r = generateRamp({
+          seed: p.value.oklch,
+          steps: 10,
+          range: { min: 0.05, max: 0.97 },
+          distribution: 'linear',
+          name: `color-${i + 1}`,
+        });
+        if (!r.ok) throw new Error('fixture generate failed');
+        return r.value;
+      });
+      window.location.hash = '#s=' + serializeState(paletteToState({ ramps }));
+      render(<App />);
+
+      expect(screen.getAllByRole('list', { name: /color ramp/i })).toHaveLength(2);
+      expect(
+        screen.getAllByPlaceholderText('Paste a color (e.g., #2563EB)'),
+      ).toHaveLength(2);
+    });
+
+    it('CSS export contains variables for all ramps', () => {
+      render(<App />);
+      enterColorAt(0, '#2563EB');
+      fireEvent.click(screen.getByRole('button', { name: /add seed/i }));
+      enterColorAt(1, '#EB2525');
+
+      fireEvent.click(screen.getByRole('button', { name: /export css/i }));
+      const code = screen.getByLabelText(
+        /generated css custom properties/i,
+      );
+      expect(code.textContent ?? '').toMatch(/--color-color-1-/);
+      expect(code.textContent ?? '').toMatch(/--color-color-2-/);
+    });
+  });
 });

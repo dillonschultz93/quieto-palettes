@@ -28,7 +28,10 @@ describe('RampView', () => {
 
   it('renders the list container with an aria-label', () => {
     render(<RampView ramp={buildRamp('#2563EB')} />);
-    expect(screen.getByRole('list')).toHaveAttribute('aria-label', 'Color ramp');
+    expect(screen.getByRole('list')).toHaveAttribute(
+      'aria-label',
+      'Color ramp: color',
+    );
   });
 
   it('renders exactly one seed-emphasized swatch', () => {

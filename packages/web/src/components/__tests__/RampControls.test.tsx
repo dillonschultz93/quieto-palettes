@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { RampControls } from '../RampControls';
-import type { RampConfig } from '../../hooks/usePalette';
+import type { RampConfig } from '../../hooks/usePalettes';
 
 const baseConfig: RampConfig = {
   steps: 10,
